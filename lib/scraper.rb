@@ -22,9 +22,26 @@ class Scraper
   end
 
   def self.scrape_profile_page(profile_url)
+    student = {}
     html = open(profile_url)
     doc = Nokogiri::HTML(html)
+    student_links = doc.css(".social-icon-container").children.css('a').map {|link| link['href']}
+    student_links.each do |link|
+      if link.include?("twitter")
+      student[:twitter] = link
+      elsif link.include?("linkedin")
+        student[:linkedin] = link
+      elsif link.include?('github')
+        student[:github] = link
 
+      else
+        student[:blog] = link
+      end
+
+    end
+    student[:profile_quote] = doc.css(".profile-quote").text if doc.css(".profile-quote")
+    student[:bio] = doc.css('.description-holder').children.css('p').text
+      student
   end
 
 end
